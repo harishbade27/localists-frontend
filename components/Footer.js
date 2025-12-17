@@ -30,7 +30,7 @@ export default function Footer() {
             <div
               key={index}
               className="
-                w-[320px] h-[260px]
+                w-[320px] h-[320px]
                 border-4 border-[#DBDFE4]
                 rounded-[20px]
                 flex flex-col
