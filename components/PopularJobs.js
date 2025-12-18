@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import JobCard from "./JobCard";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
@@ -14,6 +14,35 @@ export default function PopularJobs() {
     { title: "Architects", image: "/image7.jpg" },
     { title: "Airport Transfers", image: "/image8.jpg" },
   ];
+
+  const mobileRef = useRef(null);
+  const [mobileIndex, setMobileIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!mobileRef.current) return;
+
+      const cardWidth = 260 + 16;
+      const next = (mobileIndex + 1) % jobs.length;
+
+      mobileRef.current.scrollTo({
+        left: next * cardWidth,
+        behavior: "smooth",
+      });
+
+      setMobileIndex(next);
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [mobileIndex]);
+
+  const handleMobileScroll = () => {
+    if (!mobileRef.current) return;
+    const cardWidth = 260 + 16;
+    setMobileIndex(
+      Math.round(mobileRef.current.scrollLeft / cardWidth)
+    );
+  };
 
   const CARD_WIDTH = 240;
   const GAP = 20;
@@ -31,23 +60,11 @@ export default function PopularJobs() {
   const [slideIndex, setSlideIndex] = useState(VISIBLE);
   const [dotIndex, setDotIndex] = useState(0);
   const [animate, setAnimate] = useState(true);
-  const [mounted, setMounted] = useState(false);
-
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!mounted) return;
-
-    const timer = setInterval(() => {
-      handleNext();
-    }, 3000);
-
+    const timer = setInterval(() => handleNext(), 3000);
     return () => clearInterval(timer);
-  }, [mounted]);
-
+  }, []);
 
   useEffect(() => {
     if (slideIndex === slides.length - VISIBLE) {
@@ -66,77 +83,87 @@ export default function PopularJobs() {
   }, [slideIndex, slides.length]);
 
   useEffect(() => {
-    if (!animate) {
-      requestAnimationFrame(() => setAnimate(true));
-    }
+    if (!animate) requestAnimationFrame(() => setAnimate(true));
   }, [animate]);
 
   const handleNext = () => {
-    setSlideIndex((prev) => prev + 1);
-    setDotIndex((prev) => (prev + 1) % TOTAL_PAGES);
+    setSlideIndex((p) => p + 1);
+    setDotIndex((p) => (p + 1) % TOTAL_PAGES);
   };
 
   const handlePrev = () => {
-    setSlideIndex((prev) => prev - 1);
-    setDotIndex((prev) => (prev === 0 ? TOTAL_PAGES - 1 : prev - 1));
+    setSlideIndex((p) => p - 1);
+    setDotIndex((p) => (p === 0 ? TOTAL_PAGES - 1 : p - 1));
   };
 
   return (
     <section className="w-full bg-white py-[30px]">
-      <div className="max-w-[1440px] mx-auto px-[120px]">
+      <div className="mx-auto px-4 lg:px-[120px] lg:max-w-[1440px]">
 
-        <h2 className="font-black text-[50px] leading-[55px] tracking-[-0.03em] mb-6">
+        <h2 className="font-black text-[36px] lg:text-[50px] mb-6">
           <span className="text-[#00A9E0]">Popular</span>{" "}
           <span className="text-[#253238]">jobs.</span>
         </h2>
 
-        <div className="flex justify-end gap-2 mb-4">
-          <button
-            onClick={handlePrev}
-            className="w-[32px] h-[32px] rounded-full bg-[#A8E4F6] flex items-center justify-center hover:bg-[#7fd3eb]"
-          >
-            <FiChevronLeft />
-          </button>
-
-          <button
-            onClick={handleNext}
-            className="w-[32px] h-[32px] rounded-full bg-[#A8E4F6] flex items-center justify-center hover:bg-[#7fd3eb]"
-          >
-            <FiChevronRight />
-          </button>
-        </div>
-
-        <div
-          className="overflow-hidden mx-auto"
-          style={{ width: `${VIEWPORT_WIDTH}px` }}
-        >
+        <div className="lg:hidden">
           <div
-            className={`flex gap-[20px] ${animate ? "transition-transform duration-500 ease-in-out" : ""
-              }`}
-            style={{
-              transform: `translateX(-${slideIndex * SLIDE_WIDTH}px)`,
-            }}
+            ref={mobileRef}
+            onScroll={handleMobileScroll}
+            className="
+              flex gap-4 overflow-x-auto snap-x snap-mandatory
+              scroll-smooth pb-4
+              [&::-webkit-scrollbar]:hidden
+            "
           >
-            {slides.map((job, i) => (
-              <JobCard
-                key={`${job.title}-${i}`}
-                title={job.title}
-                image={job.image}
+            {jobs.map((job) => (
+              <div key={job.title} className="snap-center shrink-0">
+                <JobCard {...job} />
+              </div>
+            ))}
+          </div>
+
+          <div className="flex justify-center gap-2 mt-3">
+            {jobs.map((_, i) => (
+              <span
+                key={i}
+                className={`transition-all ${i === mobileIndex
+                    ? "w-[22px] h-[5px] bg-[#253238]"
+                    : "w-[6px] h-[6px] bg-[#C4C4C4]"
+                  } rounded-full`}
               />
             ))}
           </div>
         </div>
 
-        <div className="flex justify-center gap-2 mt-6">
-          {Array.from({ length: TOTAL_PAGES }).map((_, i) => (
-            <span
-              key={i}
-              className={`rounded-full transition-all duration-300 ${i === dotIndex
-                ? "w-[28px] h-[6px] bg-[#253238]"
-                : "w-[8px] h-[8px] bg-[#C4C4C4]"
-                }`}
-            />
-          ))}
+        <div className="hidden lg:block">
+          <div className="flex justify-end gap-2 mb-4">
+            <button aria-label="Previous jobs" onClick={handlePrev} className="w-[32px] h-[32px] bg-[#A8E4F6] rounded-full flex items-center justify-center">
+              <FiChevronLeft />
+            </button>
+            <button aria-label="Next jobs" onClick={handleNext} className="w-[32px] h-[32px] bg-[#A8E4F6] rounded-full flex items-center justify-center">
+              <FiChevronRight />
+            </button>
+          </div>
+
+          <div className="overflow-hidden mx-auto" style={{ width: VIEWPORT_WIDTH }}>
+            <div
+              className={`flex gap-[20px] ${animate ? "transition-transform duration-500" : ""}`}
+              style={{ transform: `translateX(-${slideIndex * SLIDE_WIDTH}px)` }}
+            >
+              {slides.map((job, i) => (
+                <JobCard key={i} {...job} />
+              ))}
+            </div>
+          </div>
+
+          <div className="flex justify-center gap-2 mt-6">
+            {Array.from({ length: TOTAL_PAGES }).map((_, i) => (
+              <span
+                key={i}
+                className={`${i === dotIndex ? "w-[28px] h-[6px] bg-[#253238]" : "w-[8px] h-[8px] bg-[#C4C4C4]"} rounded-full`}
+              />
+            ))}
+          </div>
         </div>
 
       </div>

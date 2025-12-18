@@ -3,34 +3,57 @@ import Image from "next/image";
 export default function Footer() {
   const steps = [
     {
-      icon: "/edit.png", className: "text-[#00AFE3]",
+      icon: "/edit.png",
       title: "Fill in your details for your project",
     },
     {
-      icon: "/users.png", className: "text-[#00AFE3]",
+      icon: "/users.png",
       title: "Receive quotes from Professionals",
     },
     {
-      icon: "/file.png", className: "text-[#00AFE3]",
+      icon: "/file.png",
       title: "Compare your quotes and enjoy great savings",
     },
   ];
 
   return (
-    <footer className="w-full bg-[#F7F7F7] pt-[50px] pb-[20px]">
-      <div className="max-w-[1440px] mx-auto px-[120px]">
+    <footer role="contentinfo" className="w-full bg-[#F7F7F7] pt-[50px] pb-[20px]">
+      <div
+        className="
+          mx-auto
+          px-4
 
-        <h2 className="font-black text-[50px] leading-[55px] tracking-[-0.03em] mb-6">
+          lg:max-w-[1440px]
+          lg:px-[120px]
+        "
+      >
+        <h2
+          className="
+            font-black
+            tracking-[-0.03em]
+            mb-6
+
+            text-[34px] leading-[38px]
+            lg:text-[50px] lg:leading-[55px]
+          "
+        >
           <span className="text-[#00A9E0]">How it</span>{" "}
           <span className="text-[#253238]">works.</span>
         </h2>
 
-        <div className="flex justify-between gap-[40px] mt-10 mb-[40px]">
+        <div
+          className="
+            flex flex-col gap-6 mt-10 mb-[40px]
+
+            lg:flex-row
+            lg:justify-between
+            lg:gap-[40px]
+          "
+        >
           {steps.map((step, index) => (
             <div
               key={index}
               className="
-                w-[320px] h-[320px]
                 border-4 border-[#DBDFE4]
                 rounded-[20px]
                 flex flex-col
@@ -38,6 +61,10 @@ export default function Footer() {
                 justify-center
                 text-center
                 px-6
+
+                w-full h-[260px]
+
+                lg:w-[320px] lg:h-[320px]
               "
             >
               <div className="mb-4">
@@ -50,24 +77,34 @@ export default function Footer() {
                 />
               </div>
 
-              <p className="text-[38px] font-extrabold text-[#253238] leading-[38px]">
+              <p
+                className="
+                  font-extrabold
+                  text-[#253238]
+
+                  text-[26px] leading-[30px]
+                  lg:text-[38px] lg:leading-[38px]
+                "
+              >
                 {step.title}
               </p>
             </div>
           ))}
         </div>
 
+        {/* CTA */}
         <div className="flex justify-center mb-[20px]">
           <button
             className="
               bg-[#10C87B]
               text-white
-              text-[14px]
               font-semibold
-              px-6 py-2
               rounded-full
               hover:bg-[#27ae60]
               transition
+
+              text-[14px]
+              px-6 py-2
             "
           >
             Get Started
